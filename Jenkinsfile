@@ -2,45 +2,33 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Build') {
             steps {
-                git 'https://github.com/Niva2310/sample-ci-cd-app.git'
+                sh 'pip install -r requirements.txt'
             }
         }
 
-        stage('Set up Python Environment') {
+        stage('Test') {
             steps {
-                sh '''
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install --upgrade pip
-                    pip install -r requirements.txt
-                '''
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                sh '''
-                    . venv/bin/activate
-                    python -m unittest discover tests
-                '''
+                sh 'python -m unittest discover tests'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo "🚀 Deployment step - configure to deploy to AWS EC2 or Elastic Beanstalk"
+                echo "Deployment step - configure to deploy to AWS EC2 or Elastic Beanstalk"
             }
         }
     }
 
     post {
         success {
-            echo '✅ Pipeline completed successfully!'
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo '❌ Pipeline failed! Check console output for details.'
+            echo 'Pipeline failed!'
         }
     }
 }
+
+
