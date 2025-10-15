@@ -4,13 +4,14 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'pip install -r requirements.txt'
+                bat 'python -m venv venv'
+                bat 'venv\\Scripts\\activate && pip install -r requirements.txt'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'python -m unittest discover tests'
+                bat 'venv\\Scripts\\activate && python -m unittest discover tests'
             }
         }
 
@@ -30,5 +31,3 @@ pipeline {
         }
     }
 }
-
-
