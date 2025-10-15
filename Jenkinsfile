@@ -3,9 +3,9 @@ pipeline {
 
     environment {
         VENV_DIR = "venv"
-        AWS_EC2_USER = "ec2-user"          // replace with your EC2 username
-        AWS_EC2_HOST = "your-ec2-ip"       // replace with your EC2 public IP
-        AWS_EC2_KEY = "C:\\path\\to\\your\\key.pem" // path to your private key
+        AWS_EC2_USER = "ec2-user"              // your EC2 username
+        AWS_EC2_HOST = "your-ec2-ip"           // your EC2 public IP
+        AWS_EC2_KEY = "C:\\path\\to\\your\\key.pem" // path to private key
     }
 
     stages {
@@ -31,13 +31,13 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo "Deploying Flask app to AWS EC2..."
-                // Copy app files to EC2 using SCP
+                // Copy files using native scp
                 bat """
-                pscp -i %AWS_EC2_KEY% -r * %AWS_EC2_USER%@%AWS_EC2_HOST%:/home/%AWS_EC2_USER%/app/
+                scp -i %AWS_EC2_KEY% -r * %AWS_EC2_USER%@%AWS_EC2_HOST%:/home/%AWS_EC2_USER%/app/
                 """
-                // SSH to EC2 and start Flask app (example with tmux so it runs in background)
+                // SSH and start app in background
                 bat """
-                plink -i %AWS_EC2_KEY% %AWS_EC2_USER%@%AWS_EC2_HOST% "cd /home/%AWS_EC2_USER%/app && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && tmux new -d -s flask_app 'python app.py'"
+                ssh -i %AWS_EC2_KEY% %AWS_EC2_USER%@%AWS_EC2_HOST% "cd /home/%AWS_EC2_USER%/app && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && nohup python3 app.py &"
                 """
             }
         }
